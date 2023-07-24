@@ -11,7 +11,7 @@
   <properties>
     <frontend.working.directory>frontend/</frontend.working.directory>
     <frontend.build.path>${frontend.working.directory}dist/</frontend.build.path>
-    <frontend.target.path>plugin-webapp/camunda-opentosca-plugin/app</frontend.target.path>
+    <frontend.target.path>plugin-webapp/camunda-deployment-view-plugin/app</frontend.target.path>
 	<camunda.version>7.19.0</camunda.version>
   </properties>
 
@@ -36,7 +36,29 @@
       <version>3.1.0</version>
       <scope>compile</scope>
     </dependency>
-
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>2.1.214</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>5.4.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <artifactId>annotations</artifactId>
+      <groupId>org.jetbrains</groupId>
+      <version>24.0.1</version>
+    </dependency>
   </dependencies>
 
   <build>

@@ -1,9 +1,8 @@
 package org.quantil.camunda.plugin.cockpit.client.model;
 
-import com.fasterxml.jackson.annotation.JsonKey;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class Resource {
 
@@ -20,13 +19,13 @@ public class Resource {
     }
 
     @JsonProperty("_links")
-    private HashMap<String, Link> links;
+    private Map<String, Link> links;
 
-    public HashMap<String, Link> getLinks() {
+    public Map<String, Link> getLinks() {
         return links;
     }
 
-    public void setLinks(HashMap<String, Link> links) {
+    public void setLinks(Map<String, Link> links) {
         this.links = links;
     }
 }

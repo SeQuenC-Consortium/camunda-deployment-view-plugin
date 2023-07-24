@@ -1,10 +1,12 @@
 package org.quantil.camunda.plugin.cockpit.client.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LogEntry {
-    @JsonProperty("timestamp")
-    private long timestamp;
+    @JsonProperty("start_timestamp")
+    private long startTimestamp;
 
     @JsonProperty("end_timestamp")
     private long endTimestamp;
@@ -12,12 +14,12 @@ public class LogEntry {
     private String type;
     private String message;
 
-    public long getTimestamp() {
-        return timestamp;
+    public long getStartTimestamp() {
+        return startTimestamp;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setStartTimestamp(long startTimestamp) {
+        this.startTimestamp = startTimestamp;
     }
 
     public long getEndTimestamp() {

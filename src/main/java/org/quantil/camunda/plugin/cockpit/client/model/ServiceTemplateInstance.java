@@ -1,9 +1,9 @@
 package org.quantil.camunda.plugin.cockpit.client.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ServiceTemplateInstance extends Resource {
     private String state;
 

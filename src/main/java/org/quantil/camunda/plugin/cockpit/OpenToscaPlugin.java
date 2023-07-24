@@ -3,7 +3,6 @@ package org.quantil.camunda.plugin.cockpit;
 import org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin;
 import org.quantil.camunda.plugin.cockpit.resources.OpenToscaRootResource;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +20,7 @@ public class OpenToscaPlugin extends AbstractCockpitPlugin {
 
     @Override
     public Set<Class<?>> getResourceClasses() {
-        HashSet<Class<?>> classes = new HashSet<Class<?>>();
+        HashSet<Class<?>> classes = new HashSet<>();
         classes.add(OpenToscaRootResource.class);
         return classes;
     }

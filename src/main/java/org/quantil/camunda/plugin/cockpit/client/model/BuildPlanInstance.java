@@ -1,7 +1,10 @@
 package org.quantil.camunda.plugin.cockpit.client.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BuildPlanInstance extends Resource {
     private String state;
 

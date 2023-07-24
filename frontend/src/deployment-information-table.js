@@ -1,7 +1,7 @@
 export async function renderDeploymentInformationTable(node, {processInstanceId, api}) {
     node.innerHTML = "Loading..."
     const {cockpitApi, engine} = api;
-    const processViewEndpoint = `${cockpitApi}/plugin/camunda-opentosca-plugin/${engine}/process-instance/${processInstanceId}/deployment-info`;
+    const processViewEndpoint = `${cockpitApi}/plugin/camunda-deployment-view-plugin/${engine}/process-instance/${processInstanceId}/deployment-info`;
     console.log('Retrieving currently active view using URL: ', processViewEndpoint);
     let res = await fetch(processViewEndpoint, {
         headers: {
