@@ -1,8 +1,7 @@
-package org.quantil.camunda.plugin.cockpit.dto;
+package org.quantil.camunda.plugin.opentosca.dto;
 
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 public class DeploymentInformation {

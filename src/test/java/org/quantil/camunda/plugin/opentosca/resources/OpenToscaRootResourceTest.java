@@ -1,22 +1,13 @@
-package org.quantil.camunda.plugin.cockpit.resources;
+package org.quantil.camunda.plugin.opentosca.resources;
 
 import jakarta.ws.rs.ClientErrorException;
-import org.camunda.bpm.cockpit.Cockpit;
-import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngines;
-import org.camunda.bpm.engine.impl.test.TestHelper;
-import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.impl.BpmnParser;
-import org.camunda.bpm.model.xml.ModelInstance;
-import org.junit.Before;
 import org.junit.Test;
-import org.quantil.camunda.plugin.cockpit.client.OpenToscaClient;
-import org.quantil.camunda.plugin.cockpit.client.model.*;
-import org.quantil.camunda.plugin.cockpit.dto.DeploymentInformation;
+import org.quantil.camunda.plugin.opentosca.client.OpenToscaClient;
+import org.quantil.camunda.plugin.opentosca.client.model.*;
+import org.quantil.camunda.plugin.opentosca.dto.DeploymentInformation;
 
 import java.util.Collections;
 import java.util.Date;
@@ -50,19 +41,18 @@ public class OpenToscaRootResourceTest extends AbstractCockpitPluginTest {
                 Collections.singletonList(new BpmnParser().parseModelFromStream(OpenToscaRootResource.class.getResourceAsStream("/example-model.bpmn"))),
                 Collections.emptyList());
         ProcessInstance processInstance = getProcessEngine().getRuntimeService().startProcessInstanceByKey("testProcess");
+        getProcessEngine().getRuntimeService().setVariable(processInstance.getProcessInstanceId(), "Activity_1ay99v4_deploymentBuildPlanInstanceUrl", "url_from_var");
         OpenToscaRootResource openToscaRootResource = new OpenToscaRootResource();
         OpenToscaClient client = mock(OpenToscaClient.class);
         openToscaRootResource.setOpenToscaClient(client);
 
-        BuildPlanInstances firstInstances = new BuildPlanInstances();
         BuildPlanInstance firstInstance = new BuildPlanInstance();
         firstInstance.setState("STARTED");
         firstInstance.setLogs(Collections.emptyList());
         firstInstance.setLinks(Collections.emptyMap());
-        firstInstances.setPlanInstances(Collections.singletonList(firstInstance));
-        when(client.fetchBuildPlanInstances("http://host.docker.internal:1337", "ServiceTemplate-Activity_0qfo5i0")).thenReturn(firstInstances);
+        when(client.fetch("http://localhost:1337/csars/PetClinic_MySQL-OpenStack-w1.csar/servicetemplates/PetClinic_MySQL-OpenStack-w1/buildplans/PetClinic_MySQL-OpenStack-w1_buildPlan/instances/16896083708250.9122025474743877",
+                BuildPlanInstance.class)).thenReturn(firstInstance);
 
-        BuildPlanInstances secondInstances = new BuildPlanInstances();
         BuildPlanInstance secondInstance = new BuildPlanInstance();
         secondInstance.setState("PROVISIONED");
         LogEntry logEntry = new LogEntry();
@@ -73,10 +63,9 @@ public class OpenToscaRootResourceTest extends AbstractCockpitPluginTest {
         Resource.Link link = new Resource.Link();
         link.setHref("http://service_template_instance");
         secondInstance.setLinks(Collections.singletonMap("service_template_instance", link));
-        secondInstances.setPlanInstances(Collections.singletonList(secondInstance));
-        when(client.fetchBuildPlanInstances("http://host.docker.internal:1337", "PetClinic_MySQL-OpenStack-w1")).thenReturn(secondInstances);
+        when(client.fetch("url_from_var", BuildPlanInstance.class)).thenReturn(secondInstance);
 
-        when(client.fetchBuildPlanInstances("http://host.docker.internal:1337", "test_w1-wip1")).thenThrow(ClientErrorException.class);
+        when(client.fetch("http://localhost:1337/csars/PetClinic_MySQL-OpenStack-w1.csar/servicetemplates/PetClinic_MySQL-OpenStack-w1/buildplans/PetClinic_MySQL-OpenStack-w1_buildPlan/instances/16896083708250.91220254747438636", BuildPlanInstance.class)).thenThrow(ClientErrorException.class);
 
 
         ServiceTemplateInstance serviceTemplateInstance = new ServiceTemplateInstance();
@@ -88,10 +77,10 @@ public class OpenToscaRootResourceTest extends AbstractCockpitPluginTest {
         List<DeploymentInformation> deploymentInformations = openToscaRootResource.getDeploymentInformation(getProcessEngine().getName(), processInstance.getProcessInstanceId());
 
         assertEquals(2, deploymentInformations.size());
-        assertEquals("ServiceTemplate-Activity_0qfo5i0", deploymentInformations.get(0).getCsarName());
+        assertEquals("PetClinic_MySQL-OpenStack-w1", deploymentInformations.get(0).getCsarName());
         assertEquals("STARTED", deploymentInformations.get(0).getBuildPlanState());
         assertEquals(null, deploymentInformations.get(0).getInstanceState());
-        assertEquals("PetClinic_MySQL-OpenStack-w1", deploymentInformations.get(1).getCsarName());
+        assertEquals("abcServiceTemplate-Activity_1sfrg9c", deploymentInformations.get(1).getCsarName());
         assertEquals("PROVISIONED", deploymentInformations.get(1).getBuildPlanState());
         assertEquals("OK", deploymentInformations.get(1).getInstanceState());
         assertEquals(1, deploymentInformations.get(1).getLogs().size());

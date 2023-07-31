@@ -1,7 +1,7 @@
-package org.quantil.camunda.plugin.cockpit;
+package org.quantil.camunda.plugin.opentosca;
 
 import org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin;
-import org.quantil.camunda.plugin.cockpit.resources.OpenToscaRootResource;
+import org.quantil.camunda.plugin.opentosca.resources.OpenToscaRootResource;
 
 import java.util.HashSet;
 import java.util.Set;

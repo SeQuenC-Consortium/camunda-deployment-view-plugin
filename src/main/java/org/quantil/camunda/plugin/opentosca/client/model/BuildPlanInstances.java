@@ -1,8 +1,9 @@
-package org.quantil.camunda.plugin.cockpit.client.model;
+package org.quantil.camunda.plugin.opentosca.client.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+
 
 public class BuildPlanInstances extends Resource {
     @JsonProperty("plan_instances")

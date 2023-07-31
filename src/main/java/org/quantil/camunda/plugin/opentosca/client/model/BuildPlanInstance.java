@@ -1,6 +1,8 @@
-package org.quantil.camunda.plugin.cockpit.client.model;
+package org.quantil.camunda.plugin.opentosca.client.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.quantil.camunda.plugin.opentosca.client.model.LogEntry;
+import org.quantil.camunda.plugin.opentosca.client.model.Resource;
 
 import java.util.List;
 

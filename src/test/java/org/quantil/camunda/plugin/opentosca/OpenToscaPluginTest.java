@@ -1,4 +1,4 @@
-package org.quantil.camunda.plugin;
+package org.quantil.camunda.plugin.opentosca;
 
 
 import org.camunda.bpm.cockpit.Cockpit;
