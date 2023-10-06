@@ -14,5 +14,8 @@
     "node-sass": "^9.0.0",
     "rollup": "^3.26.3",
     "rollup-plugin-scss": "^4.0.0"
+  },
+  "dependencies": {
+    "diagram-js": "^12.3.0"
   }
 }

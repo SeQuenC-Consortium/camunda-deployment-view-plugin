@@ -1,8 +1,11 @@
+import OpenTOSCARenderer from "./OpenTOSCARenderer.js";
+
 export function addSubprocessToggleButton(viewer, options, {control}) {
+    const canvas = viewer.get("canvas")
+    new OpenTOSCARenderer(viewer.get("eventBus"), viewer.get("styles"), viewer.get("bpmnRenderer"), viewer.get("textRenderer"), canvas)
     const actionButtonElement = document.createElement("button")
     let showSubProcesses = false
 
-    const canvas = viewer.get("canvas")
     const elementRegistry = viewer.get("elementRegistry")
     const drilldownOverlayBehavior = viewer.get("drilldownOverlayBehavior")
     const subProcesses = elementRegistry

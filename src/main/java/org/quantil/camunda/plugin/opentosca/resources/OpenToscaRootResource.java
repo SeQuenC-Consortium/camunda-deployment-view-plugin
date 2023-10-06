@@ -62,6 +62,9 @@ public class OpenToscaRootResource extends AbstractCockpitPluginRootResource {
                                     String deploymentModelUrl = subProcess.getAttributeValueNs(OPENTOSCA_NS, "deploymentModelUrl");
                                     String id = subProcess.getId();
                                     String deploymentBuildPlanInstanceUrl = (String) runtimeService.getVariableLocal(processInstanceId, id + "_deploymentBuildPlanInstanceUrl");
+                                    if (deploymentBuildPlanInstanceUrl == null)
+                                        deploymentBuildPlanInstanceUrl = subProcess.getAttributeValueNs(OPENTOSCA_NS, "deploymentBuildPlanInstanceUrl");
+
                                     return fetchDeploymentInformation(deploymentModelUrl, deploymentBuildPlanInstanceUrl);
                                 }))
                 .filter(Objects::nonNull)
