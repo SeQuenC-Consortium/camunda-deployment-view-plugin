@@ -115,6 +115,7 @@ export default class OpenTOSCARenderer {
             if (element.type === SERVICE_TASK_TYPE) {
                 if (type === 'render.shape') {
                     const task = bpmnRenderer.drawShape(parentGfx, element);
+                    this.addSubprocessView(parentGfx, element, bpmnRenderer);
                     this.maybeAddShowDeploymentModelButton(parentGfx, element);
                     return task
                 }
@@ -153,6 +154,70 @@ export default class OpenTOSCARenderer {
             svgPrepend(canvas._svg, defs);
         }
         svgAppend(defs, marker);
+    }
+
+    addSubprocessView(parentGfx, element, bpmnRenderer) {
+        let deploymentModelUrl = element.businessObject.get('opentosca:deploymentModelUrl');
+        if (!deploymentModelUrl) return;
+
+        let groupDef = svgCreate('g');
+        svgAttr(groupDef, {transform: `matrix(1, 0, 0, 1, ${-150}, ${-100})`});
+        bpmnRenderer.drawShape(groupDef, {
+            ...element,
+            type: 'bpmn:ScriptTask',
+            businessObject: {
+                "name": "Create deployment"
+            }
+        });
+        svgAppend(parentGfx, groupDef);
+
+        bpmnRenderer.drawConnection(parentGfx, {
+            ...element,
+            type: 'bpmn:SequenceFlow',
+            businessObject: {},
+            waypoints: [
+                {x: -50, y: -60},
+                {x: 0, y: -60},
+            ]
+        });
+
+        groupDef = svgCreate('g');
+        svgAttr(groupDef, {transform: `matrix(1, 0, 0, 1, ${0}, ${-100})`});
+        bpmnRenderer.drawShape(groupDef, {
+            ...element,
+            type: 'bpmn:ScriptTask',
+            businessObject: {
+                "name": "Wait for deployment"
+            }
+        });
+        svgAppend(parentGfx, groupDef);
+
+        bpmnRenderer.drawConnection(parentGfx, {
+            ...element,
+            type: 'bpmn:SequenceFlow',
+            businessObject: {},
+            waypoints: [
+                {x: 100, y: -60},
+                {x: 150, y: -60},
+            ]
+        });
+
+        groupDef = svgCreate('g');
+        svgAttr(groupDef, {transform: `matrix(1, 0, 0, 1, ${150}, ${-100})`});
+        bpmnRenderer.drawShape(groupDef, {
+            ...element,
+            type: 'bpmn:ServiceTask',
+            businessObject: {
+                "name": "Call service"
+            }
+        });
+        svgAppend(parentGfx, groupDef);
+        svgAppend(parentGfx, svgCreate("path", {
+            d: "M -160 -110 L 260 -110 L 260 -10   L 55 -10   L 50 -5  L 45 -10  L -160 -10 Z",
+            fill: "none",
+            stroke: "#777777",
+            "pointer-events": "all"
+        }));
     }
 
     maybeAddShowDeploymentModelButton(parentGfx, element) {
