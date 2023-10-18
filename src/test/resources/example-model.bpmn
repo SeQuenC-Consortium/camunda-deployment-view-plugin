@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                   xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                   xmlns:opentosca="https://github.com/UST-QuAntiL/OpenTOSCA"
+                   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+                   xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="testProcess" isExecutable="true">
+    <bpmn2:startEvent id="StartEvent_1">
+      <bpmn2:outgoing>Flow_1pxdwzg</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:serviceTask id="Activity_18vw6ai"
+                       camunda:type="external" camunda:topic="abc"
+                       opentosca:deploymentModelUrl="http://winery/api/servicetemplates/http%253A%252F%252Fquantil.org%252Fquantme%252Fpush/PetClinic_MySQL-OpenStack-w1/?csar"
+                       opentosca:deploymentServiceInstanceUrl="http://localhost:1337/csars/PetClinic_MySQL-OpenStack-w1.csar/servicetemplates/PetClinic_MySQL-OpenStack-w1/instances/19"
+                       opentosca:deploymentBuildPlanInstanceUrl="http://localhost:1337/csars/PetClinic_MySQL-OpenStack-w1.csar/servicetemplates/PetClinic_MySQL-OpenStack-w1/buildplans/PetClinic_MySQL-OpenStack-w1_buildPlan/instances/16896083708250.9122025474743877">
+      <bpmn2:incoming>Flow_1pxdwzg</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0xa8rob</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="Flow_0xa8rob" sourceRef="Activity_18vw6ai" targetRef="Activity_1ay99v4" />
+    <bpmn2:sequenceFlow id="Flow_1pxdwzg" sourceRef="StartEvent_1" targetRef="Activity_18vw6ai" />
+    <bpmn2:subProcess id="Activity_1ay99v4" opentosca:onDemandDeployment="true"
+                      opentosca:deploymentModelUrl="http://winery/api/servicetemplates/http%253A%252F%252Fquantil.org%252Fquantme%252Fpush/abcServiceTemplate-Activity_1sfrg9c/?csar">
+      <bpmn2:startEvent id="Event_0liyaet">
+        <bpmn2:outgoing>Flow_0a8gyv2</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:sequenceFlow id="Flow_0a8gyv2" sourceRef="Event_0liyaet" targetRef="Activity_07lz2uh" />
+      <bpmn2:serviceTask id="Activity_07lz2uh" camunda:type="external" camunda:topic="abc">
+        <bpmn2:incoming>Flow_0a8gyv2</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_0yoto8p</bpmn2:outgoing>
+        <!--- How implement the deployment? In a Script Task? -->
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="Activity_1excvsj"
+                         camunda:type="external" camunda:topic="abc"
+                         opentosca:deploymentModelUrl="{{ wineryEndpoint }}/servicetemplates/http%253A%252F%252Fquantil.org%252Fquantme%252Fpush/abcServiceTemplate-Activity_1sfrg9c/?csar">
+        <bpmn2:incoming>Flow_0yoto8p</bpmn2:incoming>
+      </bpmn2:serviceTask>
+      <bpmn2:sequenceFlow id="Flow_0yoto8p" sourceRef="Activity_07lz2uh" targetRef="Activity_1excvsj" />
+    </bpmn2:subProcess>
+    <bpmn2:sequenceFlow id="Flow_1c26l0p" sourceRef="Activity_1ay99v4" targetRef="Activity_0ci1lcf" />
+    <bpmn2:serviceTask id="Activity_0ci1lcf"
+                       camunda:type="external" camunda:topic="abc"
+                       opentosca:deploymentModelUrl="{{ wineryEndpoint }}/servicetemplates/http%253A%252F%252Fquantil.org%252Fquantme%252Fpull/test_w1-wip1/?csar"
+                       opentosca:deploymentBuildPlanInstanceUrl="http://localhost:1337/csars/PetClinic_MySQL-OpenStack-w1.csar/servicetemplates/PetClinic_MySQL-OpenStack-w1/buildplans/PetClinic_MySQL-OpenStack-w1_buildPlan/instances/16896083708250.91220254747438636">
+
+      <bpmn2:incoming>Flow_1c26l0p</bpmn2:incoming>
+    </bpmn2:serviceTask>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="222" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0zjp9u9_di" bpmnElement="Activity_18vw6ai">
+        <dc:Bounds x="360" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_005cg2g_di" bpmnElement="Activity_1ay99v4">
+        <dc:Bounds x="620" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17ifka0_di" bpmnElement="Activity_0ci1lcf">
+        <dc:Bounds x="890" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0xa8rob_di" bpmnElement="Flow_0xa8rob">
+        <di:waypoint x="460" y="140" />
+        <di:waypoint x="620" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1pxdwzg_di" bpmnElement="Flow_1pxdwzg">
+        <di:waypoint x="258" y="140" />
+        <di:waypoint x="360" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1c26l0p_di" bpmnElement="Flow_1c26l0p">
+        <di:waypoint x="720" y="140" />
+        <di:waypoint x="890" y="140" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
