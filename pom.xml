@@ -12,7 +12,7 @@
     <frontend.working.directory>frontend/</frontend.working.directory>
     <frontend.build.path>${frontend.working.directory}dist/</frontend.build.path>
     <frontend.target.path>plugin-webapp/camunda-deployment-view-plugin/app</frontend.target.path>
-	<camunda.version>7.19.0</camunda.version>
+	<camunda.version>7.20.0</camunda.version>
   </properties>
 
   <dependencies>
@@ -100,14 +100,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <failIfNoTests>false</failIfNoTests>
-          <trimStackTrace>false</trimStackTrace>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
