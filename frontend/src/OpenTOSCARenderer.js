@@ -258,7 +258,7 @@ export default class OpenTOSCARenderer {
         svgAppend(parentGfx, groupDef);
 
         svgAppend(parentGfx, svgCreate("path", {
-            d: "M -160 -110 L 260 -110 L 260 -10   L 55 -10   L 50 -5  L 45 -10  L -160 -10 Z",
+            d: "M -260 -110 L 360 -110 L 360 -10   L 55 -10   L 50 -5  L 45 -10  L -260 -10 Z",
             fill: "none",
             stroke: "#777777",
             "pointer-events": "all"
