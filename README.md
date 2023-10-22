@@ -4,7 +4,7 @@ Plugin for the Camunda engine to show information about OpenTOSCA deployments at
 
 ## Integrate into Camunda Platform Webapp
 
-1. Build the Camunda Cockpit plugin (tested with jdk 19):
+1. Build the Camunda Cockpit plugin (tested with JDK 19 and Maven 3.6.1):
 ```sh
 mvn clean install
 ```
@@ -12,6 +12,8 @@ mvn clean install
 2. [Download](https://camunda.com/download/) the Camunda run distribution (tested with [7.20](https://downloads.camunda.cloud/release/camunda-bpm/run/7.20/))
 
 3. Copy the plugin jar file (located in `./target/`) to the `/configuration/userlib/` folder and start the server
+
+=======
 
 ## Run using Docker
 Build the docker image:
