@@ -161,6 +161,29 @@ export default class OpenTOSCARenderer {
         if (!deploymentModelUrl) return;
 
         let groupDef = svgCreate('g');
+        svgAttr(groupDef, {transform: `matrix(1, 0, 0, 1, ${-238}, ${-78})`});
+        bpmnRenderer.drawShape(groupDef, {
+            ...element,
+            type: 'bpmn:StartEvent',
+            height: 36,
+            width: 36,
+            businessObject: {
+                isInterrupting: true
+            }
+        });
+        svgAppend(parentGfx, groupDef);
+        bpmnRenderer.drawConnection(parentGfx, {
+            ...element,
+            type: 'bpmn:SequenceFlow',
+            businessObject: {},
+            waypoints: [
+                {x: -200, y: -60},
+                {x: -150, y: -60},
+            ]
+        });
+
+
+        groupDef = svgCreate('g');
         svgAttr(groupDef, {transform: `matrix(1, 0, 0, 1, ${-150}, ${-100})`});
         bpmnRenderer.drawShape(groupDef, {
             ...element,
@@ -212,6 +235,28 @@ export default class OpenTOSCARenderer {
             }
         });
         svgAppend(parentGfx, groupDef);
+
+        bpmnRenderer.drawConnection(parentGfx, {
+            ...element,
+            type: 'bpmn:SequenceFlow',
+            businessObject: {},
+            waypoints: [
+                {x: 250, y: -60},
+                {x: 300, y: -60},
+            ]
+        });
+
+        groupDef = svgCreate('g');
+        svgAttr(groupDef, {transform: `matrix(1, 0, 0, 1, ${301}, ${-78})`});
+        bpmnRenderer.drawShape(groupDef, {
+            ...element,
+            height: 36,
+            width: 36,
+            type: 'bpmn:EndEvent',
+            businessObject: {}
+        });
+        svgAppend(parentGfx, groupDef);
+
         svgAppend(parentGfx, svgCreate("path", {
             d: "M -160 -110 L 260 -110 L 260 -10   L 55 -10   L 50 -5  L 45 -10  L -160 -10 Z",
             fill: "none",

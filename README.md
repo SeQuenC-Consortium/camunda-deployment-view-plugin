@@ -12,6 +12,13 @@ mvn clean install
 2. [Download](https://camunda.com/download/) the Camunda run distribution (tested with [7.20](https://downloads.camunda.cloud/release/camunda-bpm/run/7.20/))
 
 3. Copy the plugin jar file (located in `./target/`) to the `/configuration/userlib/` folder and start the server
+4. Add the following to the camunda configuration `default.yml` to enable access to winery
+```yaml
+camunda.bpm:
+  webapp:
+    header-security:
+       content-security-policy-disabled: true
+```
 
 ## Run using Docker
 Build the docker image:
