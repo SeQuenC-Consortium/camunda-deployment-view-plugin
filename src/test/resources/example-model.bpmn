@@ -6,7 +6,7 @@
                    xmlns:opentosca="https://github.com/UST-QuAntiL/OpenTOSCA"
                    xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
                    xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
-  <bpmn2:process id="testProcess" isExecutable="true">
+  <bpmn2:process id="testProcess" isExecutable="true" camunda:historyTimeToLive="1">
     <bpmn2:startEvent id="StartEvent_1">
       <bpmn2:outgoing>Flow_1pxdwzg</bpmn2:outgoing>
     </bpmn2:startEvent>
