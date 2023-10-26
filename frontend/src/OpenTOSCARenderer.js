@@ -332,9 +332,18 @@ export default class OpenTOSCARenderer {
         for (let relationshipTemplate of relationshipTemplates) {
             const start = positions.get(relationshipTemplate.sourceElement.ref);
             const end = positions.get(relationshipTemplate.targetElement.ref);
+            const namePattern = /_(.*)_/g;
+            var nameMatches = namePattern.exec(relationshipTemplate.id);
+            var relationshipName;
+            if (nameMatches === null || nameMatches.length < 1) {
+              relationshipName = relationshipTemplate.id;
+            } else {
+              relationshipName = nameMatches[1];
+            }
             this.drawRelationship(groupDef,
                 start, relationshipTemplate.sourceElement.ref === topNode.id,
-                end, relationshipTemplate.targetElement.ref === topNode.id);
+                end, relationshipTemplate.targetElement.ref === topNode.id,
+                relationshipName);
         }
     }
 
@@ -345,7 +354,7 @@ export default class OpenTOSCARenderer {
         }
     }
 
-    drawRelationship(parentGfx, start, startIsToplevel, end, endIsToplevel) {
+    drawRelationship(parentGfx, start, startIsToplevel, end, endIsToplevel, lineLabel) {
         const line = createLine(connectRectangles({
             width: NODE_WIDTH,
             height: startIsToplevel ? 80 : NODE_HEIGHT,
@@ -358,29 +367,92 @@ export default class OpenTOSCARenderer {
             ...STROKE_STYLE,
             markerEnd: `url(#${DEPLOYMENT_REL_MARKER_ID})`
         }), 5);
+
+        const labelGroup = svgCreate("g");
+
+        const pathLength = line.getTotalLength();
+        const middlePoint = line.getPointAtLength(pathLength / 2);
+        svgAttr(labelGroup, {
+          transform: `matrix(1, 0, 0, 1, ${(
+            middlePoint.x -
+            LABEL_WIDTH / 2
+          ).toFixed(2)}, ${(middlePoint.y - LABEL_HEIGHT / 2).toFixed(2)})`,
+        });
+        const backgroundRect = svgCreate("rect", {
+          width: LABEL_WIDTH,
+          height: LABEL_HEIGHT,
+          fill: "#EEEEEE",
+          fillOpacity: 1,
+        });
+        svgAppend(labelGroup, backgroundRect);
+        const text = this.textRenderer.createText(lineLabel, {
+          box: {
+            width: LABEL_WIDTH,
+            height: LABEL_HEIGHT,
+          },
+          align: "center-middle",
+        });
+        svgAppend(labelGroup, text);
+        parentGfx.prepend(labelGroup);
         parentGfx.prepend(line);
     }
 
     drawNodeTemplate(parentGfx, nodeTemplate, position) {
-        const groupDef = svgCreate('g');
-        svgAttr(groupDef, {transform: `matrix(1, 0, 0, 1, ${position.x.toFixed(2)}, ${position.y.toFixed(2)})`});
-        const rect = svgCreate('rect', {
-            width: NODE_WIDTH,
-            height: NODE_HEIGHT,
-            fill: '#DDDDDD',
-            ...STROKE_STYLE
+        const groupDef = svgCreate("g");
+        svgAttr(groupDef, {
+          transform: `matrix(1, 0, 0, 1, ${position.x.toFixed(
+            2
+          )}, ${position.y.toFixed(2)})`,
         });
-
+        const rect = svgCreate("rect", {
+          width: NODE_WIDTH,
+          height: NODE_HEIGHT,
+          fill: "#DDDDDD",
+          ...STROKE_STYLE,
+        });
+    
         svgAppend(groupDef, rect);
-
+    
         const text = this.textRenderer.createText(nodeTemplate.name, {
-            box: {
-                width: NODE_WIDTH,
-                height: NODE_HEIGHT,
-            },
-            align: 'center-middle'
+          box: {
+            width: NODE_WIDTH,
+            height: NODE_HEIGHT / 2,
+          },
+          align: "center-middle",
         });
+    
         svgAppend(groupDef, text);
+    
+        const groupDef2 = svgCreate("g");
+        svgAttr(groupDef2, {
+          transform: `matrix(1, 0, 0, 1, ${position.x.toFixed(2)}, ${(
+            position.y +
+            NODE_HEIGHT / 2
+          ).toFixed(2)})`,
+        });
+    
+        const namePattern = /\}(.*)/g;
+        var typeMatches = namePattern.exec(nodeTemplate.type);
+        var typeName;
+        if (typeMatches === null && typeMatches.length < 1) {
+          typeName = nodeTemplate.type;
+        } else {
+          typeName = typeMatches[1];
+        }
+    
+        const typeText = this.textRenderer.createText("(" + typeName + ")", {
+          box: {
+            width: NODE_WIDTH,
+            height: NODE_HEIGHT / 2,
+          },
+          align: "center-middle",
+          style: {
+            fill: "#777777",
+          },
+        });
+    
+        svgAppend(groupDef2, typeText);
         parentGfx.append(groupDef);
-    }
+        parentGfx.append(groupDef2);
+      }
 }
