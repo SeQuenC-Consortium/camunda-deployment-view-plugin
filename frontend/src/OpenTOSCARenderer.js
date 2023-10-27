@@ -328,23 +328,7 @@ export default class OpenTOSCARenderer {
             }
         }
 
-
-        for (let relationshipTemplate of relationshipTemplates) {
-            const start = positions.get(relationshipTemplate.sourceElement.ref);
-            const end = positions.get(relationshipTemplate.targetElement.ref);
-            const namePattern = /_(.*)_/g;
-            var nameMatches = namePattern.exec(relationshipTemplate.id);
-            var relationshipName;
-            if (nameMatches === null || nameMatches.length < 1) {
-              relationshipName = relationshipTemplate.id;
-            } else {
-              relationshipName = nameMatches[1];
-            }
-            this.drawRelationship(groupDef,
-                start, relationshipTemplate.sourceElement.ref === topNode.id,
-                end, relationshipTemplate.targetElement.ref === topNode.id,
-                relationshipName);
-        }
+        this.drawNodeConnections(parentGfx, topNode, relationshipTemplates, positions);
     }
 
     removeDeploymentModel(parentGfx, element) {
@@ -354,48 +338,229 @@ export default class OpenTOSCARenderer {
         }
     }
 
-    drawRelationship(parentGfx, start, startIsToplevel, end, endIsToplevel, lineLabel) {
-        const line = createLine(connectRectangles({
+    drawNodeConnections(
+        parentGfx,
+        topNode,
+        relationshipTemplates,
+        nodePositions
+      ) {
+        const connectionCountAtNodeLocation = new Map();
+        const connections = [];
+    
+        const addToPort = (nodeRef, location) => {
+          const key = nodeRef + "-" + location;
+          let position;
+          if (connectionCountAtNodeLocation.has(key)) {
+            position = connectionCountAtNodeLocation.get(key) + 1;
+          } else {
+            position = 1;
+          }
+          connectionCountAtNodeLocation.set(key, position);
+          return position;
+        };
+    
+        const addConnection = (
+          sourceNode,
+          sourceLocation,
+          target,
+          targetLocation,
+          connectionName
+        ) => {
+          connections.push({
+            source: sourceNode,
+            target,
+            sourceLocation,
+            targetLocation,
+            sourcePortIndex: addToPort(sourceNode.ref, sourceLocation),
+            targetPortIndex: addToPort(target.ref, targetLocation),
+            connectionName,
+          });
+        };
+    
+        for (let relationshipTemplate of relationshipTemplates) {
+          const sourceRef = relationshipTemplate.sourceElement.ref;
+          const targetRef = relationshipTemplate.targetElement.ref;
+          const source = {
             width: NODE_WIDTH,
-            height: startIsToplevel ? 80 : NODE_HEIGHT,
-            ...start
-        }, {
+            height: sourceRef === topNode.id ? 80 : NODE_HEIGHT,
+            ref: sourceRef,
+            ...nodePositions.get(sourceRef),
+          };
+          const target = {
             width: NODE_WIDTH,
-            height: endIsToplevel ? 80 : NODE_HEIGHT,
-            ...end
-        }), this.styles.computeStyle({}, ['no-fill'], {
-            ...STROKE_STYLE,
-            markerEnd: `url(#${DEPLOYMENT_REL_MARKER_ID})`
-        }), 5);
-
-        const labelGroup = svgCreate("g");
-
-        const pathLength = line.getTotalLength();
-        const middlePoint = line.getPointAtLength(pathLength / 2);
-        svgAttr(labelGroup, {
-          transform: `matrix(1, 0, 0, 1, ${(
-            middlePoint.x -
-            LABEL_WIDTH / 2
-          ).toFixed(2)}, ${(middlePoint.y - LABEL_HEIGHT / 2).toFixed(2)})`,
-        });
-        const backgroundRect = svgCreate("rect", {
-          width: LABEL_WIDTH,
-          height: LABEL_HEIGHT,
-          fill: "#EEEEEE",
-          fillOpacity: 1,
-        });
-        svgAppend(labelGroup, backgroundRect);
-        const text = this.textRenderer.createText(lineLabel, {
-          box: {
+            height: sourceRef === topNode.id ? 80 : NODE_HEIGHT,
+            ref: targetRef,
+            ...nodePositions.get(targetRef),
+          };
+          const orientation = getOrientation(source, target, 0);
+    
+          switch (orientation) {
+            case "intersect":
+            case "bottom":
+              addConnection(
+                source,
+                "north",
+                target,
+                "south",
+                relationshipTemplate.name
+              );
+              break;
+            case "top":
+              addConnection(
+                source,
+                "south",
+                target,
+                "north",
+                relationshipTemplate.name
+              );
+              break;
+            case "right":
+              addConnection(
+                source,
+                "east",
+                target,
+                "west",
+                relationshipTemplate.name
+              );
+              break;
+            case "left":
+              addConnection(
+                source,
+                "west",
+                target,
+                "east",
+                relationshipTemplate.name
+              );
+              break;
+            case "top-left":
+              addConnection(
+                source,
+                "south",
+                target,
+                "east",
+                relationshipTemplate.name
+              );
+              break;
+            case "top-right":
+              addConnection(
+                source,
+                "south",
+                target,
+                "west",
+                relationshipTemplate.name
+              );
+              break;
+            case "bottom-left":
+              addConnection(
+                source,
+                "north",
+                target,
+                "east",
+                relationshipTemplate.name
+              );
+              break;
+            case "bottom-right":
+              addConnection(
+                source,
+                "north",
+                target,
+                "west",
+                relationshipTemplate.name
+              );
+              break;
+            default:
+              return;
+          }
+        }
+    
+        for (const connection of connections) {
+          const getPortPoint = (element, location, locationIndex) => {
+            const portCount = connectionCountAtNodeLocation.get(
+              element.ref + "-" + location
+            );
+            if (location === "north") {
+              return {
+                x: element.x + (element.width / (portCount + 1)) * locationIndex,
+                y: element.y,
+              };
+            } else if (location === "south") {
+              return {
+                x: element.x + (element.width / (portCount + 1)) * locationIndex,
+                y: element.y + element.height,
+              };
+            } else if (location === "east") {
+              return {
+                x: element.x,
+                y: element.y + (element.height / (portCount + 1)) * locationIndex,
+              };
+            } else if (location === "west") {
+              return {
+                x: element.x + element.width,
+                y: element.y + (element.height / (portCount + 1)) * locationIndex,
+              };
+            }
+          };
+    
+          const getSimpleDirection = (direction) =>
+            direction === "north" || direction === "south" ? "v" : "h";
+    
+          const points = connectPoints(
+            getPortPoint(
+              connection.source,
+              connection.sourceLocation,
+              connection.sourcePortIndex
+            ),
+            getPortPoint(
+              connection.target,
+              connection.targetLocation,
+              connection.targetPortIndex
+            ),
+            getSimpleDirection(connection.sourceLocation) +
+              ":" +
+              getSimpleDirection(connection.targetLocation)
+          );
+    
+          const line = createLine(
+            points,
+            this.styles.computeStyle({}, ["no-fill"], {
+              ...STROKE_STYLE,
+              markerEnd: `url(#${DEPLOYMENT_REL_MARKER_ID})`,
+            }),
+            5
+          );
+    
+          const labelGroup = svgCreate("g");
+    
+          const pathLength = line.getTotalLength();
+          const middlePoint = line.getPointAtLength(pathLength / 2);
+          svgAttr(labelGroup, {
+            transform: `matrix(1, 0, 0, 1, ${(
+              middlePoint.x -
+              LABEL_WIDTH / 2
+            ).toFixed(2)}, ${(middlePoint.y - LABEL_HEIGHT / 2).toFixed(2)})`,
+          });
+          const backgroundRect = svgCreate("rect", {
             width: LABEL_WIDTH,
             height: LABEL_HEIGHT,
-          },
-          align: "center-middle",
-        });
-        svgAppend(labelGroup, text);
-        parentGfx.prepend(labelGroup);
-        parentGfx.prepend(line);
-    }
+            fill: "#EEEEEE",
+            fillOpacity: 0.75,
+          });
+          svgAppend(labelGroup, backgroundRect);
+          const text = this.textRenderer.createText(connection.connectionName, {
+            box: {
+              width: LABEL_WIDTH,
+              height: LABEL_HEIGHT,
+            },
+            align: "center-middle",
+            style: {
+              fontSize: 10,
+            },
+          });
+          svgAppend(labelGroup, text);
+          parentGfx.prepend(labelGroup);
+          parentGfx.prepend(line);
+        }
+      }
 
     drawNodeTemplate(parentGfx, nodeTemplate, position) {
         const groupDef = svgCreate("g");
