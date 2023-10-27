@@ -315,12 +315,26 @@ export default class OpenTOSCARenderer {
         let ySubtract = parseInt(topNode.y);
         let xSubtract = parseInt(topNode.x);
 
+        let xMin = 0;
+        let xMax = 0;
+        let yMax = 0;
+
         const positions = new Map();
         for (let nodeTemplate of nodeTemplates) {
             const position = {
                 x: (parseInt(nodeTemplate.x) - xSubtract) / 1.4,
                 y: (parseInt(nodeTemplate.y) - ySubtract) / 1.4,
             };
+
+            if (position.x < xMin) {
+              xMin = position.x;
+            }
+            if (position.x > xMax) {
+              xMax = position.x;
+            }
+            if (position.y > yMax) {
+              yMax = position.y;
+            }
 
             positions.set(nodeTemplate.id, position);
             if (nodeTemplate.id !== topNode.id) {
@@ -329,7 +343,17 @@ export default class OpenTOSCARenderer {
         }
 
         this.drawNodeConnections(parentGfx, topNode, relationshipTemplates, positions);
+        this.drawTopologyOverlay(parentGfx, xMin-NODE_SHIFT_MARGIN/2, xMax+NODE_WIDTH+NODE_SHIFT_MARGIN/2, yMax+NODE_HEIGHT+NODE_SHIFT_MARGIN/2);
     }
+
+    drawTopologyOverlay(parentGfx, xMin, xMax, yMax) {
+      svgPrepend(parentGfx, svgCreate("path", {
+        d: `M 0 ${80-NODE_SHIFT_MARGIN} L ${xMax.toFixed(2)} ${80-NODE_SHIFT_MARGIN} L ${xMax.toFixed(2)} ${yMax.toFixed(2)}   L ${xMin.toFixed(2)} ${yMax.toFixed(2)}   L ${xMin.toFixed(2)} ${80-NODE_SHIFT_MARGIN}  L 0 ${80-NODE_SHIFT_MARGIN}  Z`,
+        fill: "none",
+        stroke: "#777777",
+        "pointer-events": "all"
+    }));
+  }
 
     removeDeploymentModel(parentGfx, element) {
         const group = select(parentGfx, '#' + DEPLOYMENT_GROUP_ID);
