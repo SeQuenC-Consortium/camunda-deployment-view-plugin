@@ -124,6 +124,7 @@ export default class OpenTOSCARenderer {
 
         this.styles = styles;
         this.textRenderer = textRenderer;
+        this.eventBus = eventBus;
 
         this.addMarkerDefinition(canvas);
     }
@@ -341,6 +342,35 @@ export default class OpenTOSCARenderer {
                 this.drawNodeTemplate(groupDef, nodeTemplate, position);
             }
         }
+
+        const boundingBox = {
+            left: Math.min(...[...positions.values()].map((p) => p.x)) + element.x,
+            top: Math.min(...[...positions.values()].map((p) => p.y)) + element.y,
+            right:
+                Math.max(...[...positions.values()].map((p) => p.x)) +
+                NODE_WIDTH +
+                element.x,
+            bottom:
+                Math.max(...[...positions.values()].map((p) => p.y)) +
+                NODE_HEIGHT +
+                element.y,
+        };
+
+        const event = {
+            context: {
+                shape: {
+                    ...element,
+                    parent: element.parent,
+                    x: boundingBox.left,
+                    y: boundingBox.top,
+                    width: boundingBox.right - boundingBox.left,
+                    height: boundingBox.bottom - boundingBox.top,
+                },
+                hints: {},
+            },
+        };
+        this.eventBus.fire("commandStack.shape.resize.preExecute", event);
+        this.eventBus.fire("commandStack.shape.resize.postExecuted", event);
 
         this.drawNodeConnections(parentGfx, topNode, relationshipTemplates, positions);
         this.drawTopologyOverlay(parentGfx, xMin-NODE_SHIFT_MARGIN/2, xMax+NODE_WIDTH+NODE_SHIFT_MARGIN/2, yMax+NODE_HEIGHT+NODE_SHIFT_MARGIN/2);
@@ -621,9 +651,9 @@ export default class OpenTOSCARenderer {
         });
     
         const namePattern = /\}(.*)/g;
-        var typeMatches = namePattern.exec(nodeTemplate.type);
-        var typeName;
-        if (typeMatches === null && typeMatches.length < 1) {
+        const typeMatches = namePattern.exec(nodeTemplate.type);
+        let typeName;
+        if (typeMatches === null || typeMatches.length === 0) {
           typeName = nodeTemplate.type;
         } else {
           typeName = typeMatches[1];
